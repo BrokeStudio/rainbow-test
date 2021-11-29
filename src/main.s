@@ -358,12 +358,18 @@ apu_clear_loop:
       ; Length
       lda RNBW::BUF_IN
       cmp #152
-      bne fail
+      beq :+
+        lda #'1'
+        jmp fail
+    :
 
       ; Type
       lda RNBW::BUF_IN+1
       cmp #RNBW::FROM_ESP::MESSAGE_FROM_SERVER
-      bne fail
+      beq :+
+        lda #'2'
+        jmp fail
+    :
 
       ; Padding
       ldx #150
@@ -371,10 +377,13 @@ apu_clear_loop:
         lda RNBW::BUF_IN+1, x
         sta zp0
         cpx zp0
-        bne fail
+        beq :+
+          lda #'3'
+          jmp fail
+      :
 
         dex
-        bne :-
+        bne :--
 
       ; Value
       lda RNBW::BUF_IN+152
@@ -388,6 +397,7 @@ apu_clear_loop:
       jmp end_receive
 
       fail:
+        sta OAM_BUF+1+4
         ; Place error sprite
         lda #$88
         sta OAM_BUF+4
