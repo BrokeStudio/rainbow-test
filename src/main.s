@@ -472,8 +472,17 @@ apu_clear_loop:
     lda #RNBW::TO_ESP::BUFFER_CLEAR_RX_TX
     sta MAP_ESP_DATA
 
-    ; because clearing TX/RX buffers can take some times, we wait for an NMI
+    ; because clearing TX/RX buffers can take some times, we wait for an NMI ... or two
     jsr PPU::waitNMI
+    jsr PPU::waitNMI
+
+    ; disable logs
+    lda #2
+    sta MAP_ESP_DATA
+    lda #RNBW::TO_ESP::DEBUG_SET_LEVEL
+    sta MAP_ESP_DATA
+    lda #0
+    sta MAP_ESP_DATA
 
     ; Get configured server info
     lda #<get_config_cmd
