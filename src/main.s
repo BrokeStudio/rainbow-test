@@ -309,16 +309,6 @@ apu_clear_loop:
   ; enable rendering
   jsr PPU::on
 
-  ; enable ESP / disable IRQ
-  lda #1
-  sta MAP_ESP_CONFIG
-
-  ; clear TX/RX buffers
-  lda #1
-  sta MAP_ESP_DATA
-  lda #RNBW::TO_ESP::BUFFER_CLEAR_RX_TX
-  sta MAP_ESP_DATA
-
   ; start game or whatever
   jsr game_init
 
@@ -330,6 +320,10 @@ apu_clear_loop:
 
   .proc game_tick
 
+    ; reset sprite tile
+    lda #1
+    sta OAM_BUF+1
+
     ; read controller #1
     ldy #0
     jsr pad::read
@@ -338,6 +332,8 @@ apu_clear_loop:
     lda pad::padState
     and #PAD_A
     beq skipA
+      lda #'A'
+      sta OAM_BUF+1
       lda #<send_debug_msg_cmd
       ldx #>send_debug_msg_cmd
       jsr RNBW::sendData
@@ -347,6 +343,8 @@ apu_clear_loop:
     lda pad::padState
     and #PAD_B
     beq skipB
+      lda #'B'
+      sta OAM_BUF+1
       lda #<send_server_msg_cmd
       ldx #>send_server_msg_cmd
       jsr RNBW::sendData
@@ -381,6 +379,10 @@ apu_clear_loop:
       ; Value
       lda RNBW::BUF_IN+152
       sta last_received_value
+;      tax
+;      dex
+;      cpx last_received_value
+;      bne fail
 
       ; Everything went well
       jmp end_receive
@@ -419,6 +421,7 @@ apu_clear_loop:
     sta OAM_BUF
     lda #1
     sta OAM_BUF+1
+    lda #2
     sta OAM_BUF+1+4
     lda #0
     sta OAM_BUF+2
@@ -448,6 +451,19 @@ apu_clear_loop:
   .endproc
 
   .proc connect
+
+    ; enable ESP / disable IRQ
+    lda #1
+    sta MAP_ESP_CONFIG
+
+    ; clear TX/RX buffers
+    lda #1
+    sta MAP_ESP_DATA
+    lda #RNBW::TO_ESP::BUFFER_CLEAR_RX_TX
+    sta MAP_ESP_DATA
+
+    ; because clearing TX/RX buffers can take some times, we wait for an NMI
+    jsr PPU::waitNMI
 
     ; Get configured server info
     lda #<get_config_cmd

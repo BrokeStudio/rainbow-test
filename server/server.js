@@ -51,7 +51,7 @@ server.on("message", (data, remote) => {
           intervals[id].value = 0;
         }
         //clearInterval( intervals[id].interval ); //intervals[id].value = 0;
-      }, 10);
+      }, 50);
   }
   else
   {
