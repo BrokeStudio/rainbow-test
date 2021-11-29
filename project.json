@@ -1,0 +1,15 @@
+{
+  "name": "send-receive-antoine",
+  "build": 53,
+  "versionVarPrefix": "",
+  "romName": "send-receive-antoine",
+  "objPath": "obj",
+  "romsPath": "roms",
+  "sourcePath": "src",
+  "bin": "local",
+  "ca65Opts": "-DCHR_CHIPS=1",
+  "sources": [
+    "src/main.s"
+  ],
+  "libraries": []
+}
