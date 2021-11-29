@@ -353,7 +353,7 @@ apu_clear_loop:
     ; Check incoming message
     lda RNBW::ESP_CONFIG
     bpl end_receive
-      jsr RNBW::getData
+      jsr RNBW::getDataSlow
 
       ; Length
       lda RNBW::BUF_IN

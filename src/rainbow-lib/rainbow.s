@@ -16,6 +16,7 @@
   enableIRQ           = RNBW_enableIRQ
   disableIRQ          = RNBW_disableIRQ
   getData             = RNBW_getData
+  getDataSlow         = RNBW_getDataSlow
   sendData            = RNBW_sendData
   waitReady           = RNBW_waitReady
   debugA              = RNBW_debug_A
@@ -117,6 +118,30 @@
     stx BUF_IN+0
     ldy #1
   :
+    lda ESP_DATA
+    sta BUF_IN,Y
+    iny
+    dex
+    bne :-
+
+    ; return
+    rts
+
+  .endproc
+
+  .proc RNBW_getDataSlow
+
+    lda ESP_DATA      ; dummy read
+    nop               ; seems to be needed when a long message is coming
+    ldx ESP_DATA      ; get bytes number
+    stx BUF_IN+0
+    ldy #1
+  :
+    nop ; << SLOW THINGS DOWN
+    nop ; << SLOW THINGS DOWN
+    nop ; << SLOW THINGS DOWN | OK at 160MHs
+    ;nop ; << SLOW THINGS DOWN
+    ;nop ; << SLOW THINGS DOWN | OK at 80MHz
     lda ESP_DATA
     sta BUF_IN,Y
     iny
